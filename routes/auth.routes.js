@@ -45,7 +45,7 @@ router.post("/signup", (req, res) =>{
     const user = {email, name, _id} 
     res.status(201).json({user: user})
   })
-  .catch((err) = next(err))
+  .catch((err) => next(err))
 })
 
 router.post("/login", (req, res, next) => {
