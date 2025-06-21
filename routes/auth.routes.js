@@ -2,25 +2,27 @@ const express = require("express")
 const router = express.Router()
 const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
-const user = require("../models/User.model")
 const {isAuthenticated} = require("../middleware/jwt.middleware.js")
 const User = require("../models/User.model")
 
-const saltRounds = process.env.SALT_ROUNDS
+const saltRounds = parseInt(process.env.SALT_ROUNDS)
 
 router.post("/signup", (req, res) =>{
   const {email, password, name} = req.body
 
-  if (email === "" || password === "" || name === ""){
+  if (email === "" || password === "" || name === "") {
     res.status(400).json({ message: "Please enter an Email, Password and Name"})
-    return  }
+    return  
+  }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
   if (!emailRegex.test(email)){
     res.status(400).json({ message: "Please provide a valid email"})
     return
   }
+  
   const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/
+  
   if (!passwordRegex.test(password)){
     res.status(400).json({
       message:
@@ -28,26 +30,31 @@ router.post("/signup", (req, res) =>{
     })
     return
   }
+  
   User.findOne({email})
-  .then((foundUser) => {
-    if (foundUser){
-      res.status(400).json({ message: "Email already used"})
-    }
+    .then((foundUser) => {
+      if (foundUser){
+        res.status(400).json({ message: "Email already used"})
+        return
+      }
 
-    const saltRounds = bcrypt.genSaltSync(saltRounds)
-  const hashedPassword = bcrypt.hashSync(password, saltRounds)
+      const salt = bcrypt.genSaltSync(saltRounds)
+      const hashedPassword = bcrypt.hashSync(password, salt)
 
-  return User.create({ email, password: hashedPassword, name})
-  })
-  .then((createdUser)=> {
-    const {email, name , _id} = createdUser
+      User.create({ email, password: hashedPassword, name}).then((createdUser) => {
+        const {email, name , _id} = createdUser
+        const user = {email, name, _id} 
+      return res.status(201).json({user: user})
 
-    const user = {email, name, _id} 
-    res.status(201).json({user: user})
-  })
-  .catch((err) => next(err))
+    })
+    
+    
+  }).catch( (err) => {
+      res.status(500).json(err) 
+      return
+    })
 })
-
+/*
 router.post("/login", (req, res, next) => {
   const { email, password } = req.body;
 
@@ -78,23 +85,23 @@ router.post("/login", (req, res, next) => {
     .catch((err) => next(err)); 
 });
 
-router.delete("/delete-user", isAuthenticated ,async (req, res, next) => {
+// router.delete("/delete-user", isAuthenticated ,async (req, res, next) => {
 
-  const userId = req.payload._id
+//   const userId = req.payload._id
 
-  try {
-    await User.findByIdAndDelete(userId)
-    await Expense.deleteMany({ user: userId })
-    res.status(200).send({message: "User account deleted"})
-  }
-  catch (err){
-    next(err)
-  }
-})
+//   try {
+//     await User.findByIdAndDelete(userId)
+//     await Expense.deleteMany({ user: userId })
+//     res.status(200).send({message: "User account deleted"})
+//   }
+//   catch (err){
+//     next(err)
+//   }
+// })
 
-router.get("/verify", isAuthenticated, (req, res, next) => {
-  console.log(`req.payload`, req.payload)
-    res.status(200).json(req.payload);
-});
-
+// router.get("/verify", isAuthenticated, (req, res, next) => {
+//   console.log(`req.payload`, req.payload)
+//     res.status(200).json(req.payload);
+// });
+*/
 module.exports = router
