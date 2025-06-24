@@ -1,22 +1,10 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+const { Schema, model } = require("mongoose")
 
-const categorySchema = new Schema({
-  name: {
-    type: String,
-    required: [true, "Enter name of category"],
-    maxlength: 20,
-    trim: true,
-  },
-  icon: {
-    type: String,
-    maxlength: 2, 
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-});
+const categorySchema = new Schema ({
+    name: {type: String, required: [true, "Please name the expense"], maxlength: 40},
+    emoji: {type: String, maxlength: 2}
 
-module.exports = model("Category", categorySchema);
+})
+
+const Category = model("Category", categorySchema)
+module.exports = Category

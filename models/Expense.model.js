@@ -1,12 +1,11 @@
-const mongoose = require("mongoose")
-const { Schema } = mongoose
+const { Schema, model } = require("mongoose")
 
 const expenseSchema = new Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, 
+    user: { type: Schema.Types.ObjectId, 
         ref: "User", 
         required: true},
     category: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Category",
     required: true
    },
@@ -30,5 +29,5 @@ const expenseSchema = new Schema({
     }
 
 })
-
-module.exports = mongoose.model("Expense", expenseSchema)
+const Expense = model("Expense", expenseSchema)
+module.exports = Expense

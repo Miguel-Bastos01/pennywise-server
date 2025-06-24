@@ -3,9 +3,11 @@ const router = express.Router()
 const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
 const {isAuthenticated} = require("../middleware/jwt.middleware.js")
-const User = require("../models/User.model")
+const User = require("../models/User.model.js")
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS)
+
+
 
 router.post("/signup", (req, res) =>{
   const {email, password, name} = req.body
@@ -54,7 +56,7 @@ router.post("/signup", (req, res) =>{
       return
     })
 })
-/*
+
 router.post("/login", (req, res, next) => {
   const { email, password } = req.body;
 
@@ -81,9 +83,12 @@ router.post("/login", (req, res, next) => {
       } else {
         res.status(401).json({ message: "Unable to authenticate the user" });
       }
+    }).catch( (err) => {
+      res.status(500).json(err) 
+     
     })
-    .catch((err) => next(err)); 
 });
+/*
 
 // router.delete("/delete-user", isAuthenticated ,async (req, res, next) => {
 
