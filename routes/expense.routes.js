@@ -4,13 +4,13 @@ const {isAuthenticated} = require("../middleware/jwt.middleware.js")
 const Expense = require("../models/Expense.model.js")
 
 
-router.get("/expenses", isAuthenticated, (req, res, )=> {
+router.get("/expenses", isAuthenticated, (req, res, next )=> {
    
- Expense.find()
+ Expense.find({user: req.payload._id})
+ 
     .sort({createdAt: -1})
-    .then ((allExpenses) => res.json(allExpenses))
-    .catch (err) 
-  console.log(`${error}`)
+    .then ((allUserExpenses) => res.json(allUserExpenses))
+    .catch ((err) => {next (err)})
 });
 
 
