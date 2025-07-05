@@ -37,4 +37,48 @@ router.post("/expenses", isAuthenticated, (req, res, next) =>{
             next (err)
           })
 })
+
+router.get("/expenses/:id", isAuthenticated, (req, res, next) =>{
+  const {id} = req.params
+
+  Expense.findOne({_id: id, user: req.payload._id})
+    .then((expense) => {
+      if (!expense) {
+        return res.status(404).json({ message: "Expense not found"})
+      }
+      res.json(expense)
+    })
+    .catch((err) => next(err))
+})
+
+router.put("/expenses/:id", isAuthenticated, (req, res, next) => {
+  const {id} = req.params
+  const {category, amount, title, notes, mood} = req.body
+
+  Expense.findOneAndUpdate(
+    {_id: id, user: req.payload._id},
+    {category, amount, title, notes, mood},
+    {new: true}
+  )
+    .then ((updatedExpense) =>{
+      if (!updatedExpense) {
+        return res.status(404).json ({ message: "Expense not found or unauthorised"})
+      }
+      res.status(200).json(updatedExpense)
+    })
+    .catch((err) => next (err))
+})
+
+router.delete("/expenses/:id", isAuthenticated, (req, res, next) =>{
+  const {id} = req.params
+
+  Expense.findOneAndDelete({_id: id, user: req.payload._id})
+    .then((deletedExpense) => {
+      if (!deletedExpense) {
+        return res.status(404).json({ message: "Expense not found or unauthorized"})
+      }
+      res.status(200).json({ message: "Expense deleted successfully"})
+    })
+    .catch((err) => next(err))
+})
   module.exports = router
