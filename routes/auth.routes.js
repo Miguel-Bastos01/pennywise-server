@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
 const {isAuthenticated} = require("../middleware/jwt.middleware.js")
 const User = require("../models/User.model.js")
+const Expense = require("../models/Expense.model.js")
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS)
 
@@ -88,25 +89,26 @@ router.post("/login", (req, res, next) => {
      
     })
 });
-/*
 
-// router.delete("/delete-user", isAuthenticated ,async (req, res, next) => {
 
-//   const userId = req.payload._id
+router.delete("/delete-user", isAuthenticated, (req, res, next) => {
+    const userId = req.payload._id
 
-//   try {
-//     await User.findByIdAndDelete(userId)
-//     await Expense.deleteMany({ user: userId })
-//     res.status(200).send({message: "User account deleted"})
-//   }
-//   catch (err){
-//     next(err)
-//   }
-// })
+    User.findByIdAndDelete(userId)
+      .then(()=> {
+        return Expense.deleteMany({ user: userId})
+      })
+      .then(() =>{
+        res.status(200).send({ message: "Account deleted"})
+      })
+      .catch((err) =>{
+        next(err)
+      })  
+})
 
-// router.get("/verify", isAuthenticated, (req, res, next) => {
-//   console.log(`req.payload`, req.payload)
-//     res.status(200).json(req.payload);
-// });
-*/
+router.get("/verify", isAuthenticated, (req, res, next) => {
+  console.log(`req.payload`, req.payload)
+    res.status(200).json(req.payload);
+});
+
 module.exports = router
