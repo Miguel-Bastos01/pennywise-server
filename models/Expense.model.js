@@ -26,7 +26,12 @@ const expenseSchema = new Schema({
     mood: {type: String,
         enum: ['Good day','Feeling okay', 'Bad day', 'Stressed out', 'Angry'],
         default: 'Feeling okay'
-    }
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+     }
+
 
 })
 const Expense = model("Expense", expenseSchema)
